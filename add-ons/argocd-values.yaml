@@ -1,0 +1,53 @@
+# Global settings
+global:
+  image:
+    repository: quay.io/argoproj/argocd  # Docker image repository for Argo CD
+    tag: v2.4.5                           # Version of Argo CD to deploy
+    imagePullPolicy: IfNotPresent         # Pull image only if not already present on the node
+
+# Argo CD Server
+server:
+  name: argocd-server                     # Name of the Argo CD server deployment
+  service:
+    type: ClusterIP                       # Service type for internal access; options: ClusterIP, NodePort, LoadBalancer
+    port: 443                             # Port to expose Argo CD UI
+  ingress:
+    enabled: true                         # Enable Ingress for external access
+    ingressClassName: external-nginx      # Optional: explicit ingress class name
+    annotations:
+      kubernetes.io/ingress.class: "external-nginx"
+      cert-manager.io/cluster-issuer: http-01-production
+      nginx.ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    hosts:
+      - argocd.samone.store             # Domain to access Argo CD UI
+    tls:
+      - hosts:
+          - argocd.samone.store        # TLS host
+        secretName: argocd-tls           # Secret where TLS certificate is stored
+
+# Argo CD Configurations
+configs:
+  cm:
+    url: https://argocd.samone.store    # The URL users will access Argo CD UI
+    server.insecure: "false"              # Enforce HTTPS; set true only for testing
+  secret:
+    argocdServerAdminPassword: Sammy996@  # Admin password for Argo CD UI login
+
+# Repository Server
+repoServer:
+  name: argocd-repo-server                # Name of repo-server deployment
+  service:
+    type: ClusterIP                       # Internal service type
+    port: 8081                            # Port for repo-server communications
+
+# ApplicationSet Controller
+applicationSet:
+  enabled: true                           # Enable ApplicationSet controller to manage multiple apps dynamically
+
+# Redis (for caching and performance)
+redis:
+  name: argocd-redis                      # Name of the Redis deployment
+  service:
+    type: ClusterIP                       # Internal service type
+    port: 6379                            # Redis port
