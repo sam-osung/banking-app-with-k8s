@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bank-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: http-01-production
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - bankapi.samone.store  # bankend url
+    - bank.samone.store     # frontend url
+    secretName: bank-tls
+  rules:
+  - host: bank.samone.store
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bank-frontend-service
+            port:
+              number: 3000
+  - host: bankapi.samone.store
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bank-backend-service
+            port:
+              number: 8080
