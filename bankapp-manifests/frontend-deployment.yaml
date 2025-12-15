@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend-banking-container
-        image: 112399677424.dkr.ecr.us-east-1.amazonaws.com/dev-bankfrontend:11
+        image: 112399677424.dkr.ecr.us-east-1.amazonaws.com/dev-bankfrontend:12
         ports:
         - containerPort: 3000
         env:
